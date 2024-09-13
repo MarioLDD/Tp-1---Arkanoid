@@ -4,23 +4,30 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed;
+    [SerializeField] private float speed = 1000;
+    private Rigidbody2D player_Rb;
 
-    void Update()
+    private void Awake()
     {
-        var horizontalInput = Input.GetAxis("Horizontal");
+        player_Rb = GetComponent<Rigidbody2D>();
+    }
 
-        Vector3 movement = new Vector3(horizontalInput, 0, 0);
+    private void FixedUpdate()
+    {
+        float horizontalInput = Input.GetAxis("Horizontal");
+        Vector2 direction = new Vector2(horizontalInput, 0) * speed;
 
-        transform.Translate(movement * speed * Time.deltaTime);
+        player_Rb.velocity = direction * Time.fixedDeltaTime;
+    }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ball"))
+        {
+            Vector2 playerSpeed = new Vector2(player_Rb.velocity.x, 1);
 
-        Vector2 position = transform.position;
-
-        Vector2 bottomRightScreen = new Vector3(Screen.width, 0);
-        Vector2 topLeft = Camera.main.ScreenToWorldPoint(bottomRightScreen);
-
-        position.x = Mathf.Clamp(position.x, -topLeft.x + 1, topLeft.x - 1);
-        transform.position = position;
+            var ball_Rb = collision.rigidbody;
+            ball_Rb.velocity = (ball_Rb.velocity + playerSpeed).normalized * collision.gameObject.GetComponent<BallController>().InitialSpeed;
+        }
     }
 }

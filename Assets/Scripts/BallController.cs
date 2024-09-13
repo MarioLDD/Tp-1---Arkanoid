@@ -7,6 +7,7 @@ public class BallController : MonoBehaviour
     private Rigidbody2D ball_Rb;
     [SerializeField] private float initialTime;
     [SerializeField] private float initialSpeed;
+    public float InitialSpeed { get { return initialSpeed; } }
 
     private void Awake()
     {
@@ -18,7 +19,13 @@ public class BallController : MonoBehaviour
 
     private void BallLaunch()
     {
-        ball_Rb.velocity = new Vector2(Random.Range(-1f, 1f), 1).normalized * initialSpeed;
+        Vector2 randomDirection = Random.value > 0.5f ? new Vector2(0, 1) : new Vector2(0, 1);
+        randomDirection = randomDirection.normalized;
+        ball_Rb.velocity = randomDirection * initialSpeed;
+    }
+    private void FixedUpdate()
+    {
+        Debug.Log($"Ball velocity: {ball_Rb.velocity}");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
